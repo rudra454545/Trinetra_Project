@@ -1,0 +1,10 @@
+tensorflow
+pandas
+scikit-learn
+Flask
+pygame
+requests
+flask-socketio==5.3.3
+flask-cors==3.1.0
+python-engineio==4.3.4
+python-socketio==5.7.2
