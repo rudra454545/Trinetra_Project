@@ -1,0 +1,289 @@
+/* --- Base Layout & Body --- */
+body {
+  margin: 0;
+  font-family: 'Consolas', monospace;
+  background-color: #05080A;
+  color: #EAEAEA;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dashboard-layout {
+  display: grid;
+  height: 100vh;
+  width: 100vw;
+  grid-template-rows: 80px 1fr; /* header + content */
+  grid-template-columns: 350px 1fr; /* sidebar + main */
+  grid-template-areas:
+    "header header"
+    "sidebar main";
+}
+
+.main-content {
+  grid-area: main;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.data-feeds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+/* --- Header --- */
+.app-header {
+  grid-area: header;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  height: 80px;
+  background-color: #0D131A;
+  border-bottom: 1px solid #00BFFF;
+  color: #EAEAEA;
+}
+
+.header-title h1 {
+  margin: 0;
+  color: #00BFFF;
+  font-size: 2rem;
+  letter-spacing: 4px;
+}
+.header-title span {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.header-kpis {
+  display: flex;
+  gap: 2rem;
+}
+.kpi-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s ease-in-out;
+}
+.kpi-item:hover { transform: scale(1.1); }
+.kpi-label { font-size: 0.8rem; color: #888; }
+.kpi-value { font-size: 1.5rem; font-weight: bold; }
+.status-active { color: #FFA500; }
+.threat-high { color: #FF4136; }
+.kpi-value-small { font-size: 1rem; font-weight: normal; color: #EAEAEA; }
+
+.header-time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 1rem;
+}
+
+/* --- Sidebar --- */
+.app-sidebar {
+  grid-area: sidebar;
+  background-color: #0D131A;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  border-right: 1px solid #00BFFF;
+  overflow-y: auto;
+}
+
+.sidebar-section h4 {
+  color: #00BFFF;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.chart-container { height: 200px; position: relative; }
+.controls-container { display: flex; flex-direction: column; gap: 1rem; }
+.controls-container button {
+  background-color: #004A7F;
+  color: white;
+  border: 1px solid #00BFFF;
+  padding: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+.controls-container button:hover {
+  background-color: #007ACC;
+  transform: translateY(-2px);
+}
+
+/* --- Military Map (Earth + overlays) --- */
+.military-map-container {
+  position: relative;
+  height: 50vh;
+  min-height: 400px;
+  border: 2px solid #00BFFF;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.map-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(0,0,0,0.8);
+  padding: 10px 15px;
+  border: 1px solid #00BFFF;
+  border-radius: 4px;
+  color: #00BFFF;
+  z-index: 1000;
+}
+
+.enemy-lock {
+  background: rgba(255,65,54,0.15);
+  border: 1px solid #FF4136;
+  padding: 4px 6px;
+  border-radius: 4px;
+  color: #FF4136;
+  font-weight: bold;
+  font-size: 0.8rem;
+  animation: pulse-alert 1.5s infinite;
+}
+
+/* --- Jet Status Panel --- */
+.jet-status-panel {
+  padding: 1rem;
+  background-color: #0D131A;
+  border: 1px solid #00BFFF;
+  border-radius: 8px;
+}
+.jet-status-panel h3 { color: #00BFFF; margin-top: 0; }
+
+.jets-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.jet-status {
+  background-color: rgba(0,191,255,0.05);
+  padding: 1rem;
+  border-left: 3px solid #00BFFF;
+  border-radius: 4px;
+  transition: all 0.5s ease;
+}
+.jet-status.engaged { border-color: #FF4136; animation: pulse-alert 1.5s infinite; }
+.jet-status.rtb { border-color: #FFA500; }
+
+.jet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+.jet-id { font-weight: bold; font-size: 1.1rem; }
+
+.fuel-gauge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.fuel-label { color: #888; font-size: 0.7rem; width: 40px; }
+.fuel-bar-container {
+  flex: 1;
+  height: 10px;
+  background-color: #333;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.fuel-level { height: 100%; background-color: #00BFFF; transition: width 1s ease; }
+.fuel-percentage { width: 45px; text-align: right; }
+
+.weapons-status, .position-data { color: #aaa; font-size: 0.9rem; }
+
+/* --- RealTime Data Panel --- */
+.real-time-data-panel {
+  padding: 1rem;
+  background-color: #0D131A;
+  border: 1px solid #00BFFF;
+  border-radius: 8px;
+}
+.real-time-data-panel h3 { color: #00BFFF; margin-top: 0; }
+.signal-grid { display: flex; flex-direction: column; gap: 1rem; }
+
+.signal-item {
+  background-color: rgba(0,191,255,0.05);
+  padding: 1rem;
+  border-radius: 4px;
+  border: 1px solid #333;
+}
+.signal-header { display: flex; justify-content: space-between; margin-bottom: 0.8rem; }
+.signal-time { color: #888; font-size: 0.9rem; }
+.threat-alert { color: #FF4136; font-weight: bold; animation: blink 1s infinite; }
+.threat-level { color: #FFA500; font-weight: bold; }
+
+.signal-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.strength-bar-container {
+  flex: 1;
+  height: 8px;
+  background-color: #333;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.strength-bar {
+  height: 100%;
+  background-color: #00BFFF;
+  transition: width 0.5s ease;
+}
+.signal-frequency { color: #EAEAEA; }
+
+/* --- RWR Radar Display --- */
+.rwr-radar {
+  position: relative;
+  background: radial-gradient(circle at center, #0D131A 60%, #05080A 100%);
+  border: 2px solid #00BFFF;
+  border-radius: 50%;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.rwr-sweep {
+  position: absolute;
+  width: 50%;
+  height: 2px;
+  top: 50%;
+  left: 50%;
+  background: #00BFFF;
+  transform-origin: left center;
+  animation: radar-sweep 4s linear infinite;
+}
+
+.rwr-contact {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #FF4136;
+  box-shadow: 0 0 8px #FF4136;
+  animation: blink 1s infinite;
+}
+
+/* --- Animations --- */
+@keyframes blink { 50% { opacity: 0.5; } }
+@keyframes pulse-alert {
+  0% { background-color: rgba(255,65,54,0.1); }
+  50% { background-color: rgba(255,65,54,0.3); }
+  100% { background-color: rgba(255,65,54,0.1); }
+}
+@keyframes radar-sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trinetra Project Flowchart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Dark Navy Blue */
+        }
+        .icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            margin: 0 auto 0.75rem;
+            stroke-width: 1.5;
+        }
+        .flow-box {
+            border: 1px solid #30363d;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            background: linear-gradient(145deg, #1c2128, #11151c);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease-in-out;
+            position: relative;
+            z-index: 10;
+            cursor: pointer;
+        }
+        .flow-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(88, 166, 255, 0.1), 0 4px 6px -2px rgba(88, 166, 255, 0.08);
+            border-color: #58a6ff; /* Glowing light-blue */
+        }
+        .flow-title {
+            font-weight: 600;
+            color: #c9d1d9; /* Clean white text */
+        }
+        .flow-subtitle {
+            font-size: 0.875rem;
+            color: #8b949e;
+        }
+        .connector-down {
+            width: 2px;
+            height: 4rem;
+            background: linear-gradient(#30363d, #58a6ff);
+            position: relative;
+        }
+        .connector-down::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent;
+            border-right: 6px solid transparent;
+            border-top: 8px solid #58a6ff; /* Glowing light-blue */
+        }
+        .mini-icon {
+            width: 1.5rem;
+            height: 1.5rem;
+            stroke-width: 1.5;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(13, 17, 23, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-container {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-container {
+            transform: scale(1);
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #c9d1d9;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #8b949e;
+            font-size: 2rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .modal-close:hover {
+            color: #c9d1d9;
+        }
+        .modal-content {
+            color: #8b949e;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body class="text-gray-300 p-4 sm:p-8">
+    <div class="max-w-4xl mx-auto">
+        <header class="text-center mb-16">
+            <h1 class="text-4xl font-bold text-gray-100">Trinetra Project Workflow</h1>
+            <p class="text-lg text-gray-400 mt-2">High-Level Data & Analysis Pipeline (Interactive)</p>
+        </header>
+
+        <div class="flex flex-col items-center">
+
+            <!-- Stage 1: Data Ingest -->
+            <div class="grid md:grid-cols-2 gap-12 w-full">
+                <div class="flow-box" data-title="SIGINT Data" data-content="Raw signal data collected from enemy radar emissions. Includes frequency, pulse repetition interval (PRI), and signal strength. This data is the primary input for locating threat emitters.">
+                    <svg class="icon text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zm-7.518-.267A8.25 8.25 0 1120.25 10.5M8.288 14.212A5.25 5.25 0 1117.25 10.5"></path></svg>
+                    <h3 class="flow-title">SIGINT Data</h3>
+                    <p class="flow-subtitle">Enemy Radar</p>
+                </div>
+                <div class="flow-box" data-title="IMINT Data" data-content="High-resolution satellite imagery of the Area of Operations (AO). Used to visually identify and classify potential threats, infrastructure, and troop movements. Input for the object detection model.">
+                    <svg class="icon text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M12.01 19.503c-2.203 0-4.143-.9-5.594-2.349M12.01 19.503c2.203 0 4.143-.9 5.594-2.349M12.01 19.503v-4.5M3.003 12.01c0 4.966 4.028 9.003 9.003 9.003s9.003-4.036 9.003-9.003c0-4.966-4.028-9.003-9.003-9.003S3.003 7.044 3.003 12.01z"></path></svg>
+                    <h3 class="flow-title">IMINT Data</h3>
+                    <p class="flow-subtitle">Satellite Imagery</p>
+                </div>
+            </div>
+
+            <!-- Connector from Ingest to AI -->
+            <div class="flex w-full justify-around h-16 mt-4">
+                <div class="w-px bg-gray-700 h-full relative"><div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 border-b border-l border-blue-400 transform rotate-45"></div></div>
+                <div class="w-px bg-gray-700 h-full relative"><div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 border-b border-l border-blue-400 transform rotate-45"></div></div>
+            </div>
+            
+            <!-- Stage 2: Parallel AI Analysis -->
+            <div class="grid md:grid-cols-2 gap-12 w-full">
+                <div class="flow-box" data-title="Strategic AI (MLP)" data-content="A Multi-Layer Perceptron (MLP) model processes SIGINT. It uses passive trilateration principles on signal characteristics to calculate the geo-location of enemy radar systems without emitting any signals, ensuring stealth.">
+                     <svg class="icon text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M5.625 15.75a3 3 0 005.625 0M18.375 15.75a3 3 0 01-5.625 0"></path></svg>
+                    <h3 class="flow-title">Strategic AI (MLP)</h3>
+                    <p class="flow-subtitle">Passive Trilateration</p>
+                </div>
+                <div class="flow-box" data-title="Analyst AI (CNN)" data-content="A Convolutional Neural Network (CNN) analyzes IMINT. It performs object detection and classification on satellite images to identify hostile units like tanks, missile launchers, and airfields.">
+                    <svg class="icon text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639l4.43-8.859a1.012 1.012 0 011.602-.453l.484.242a.506.506 0 00.627-.453V4.5a.506.506 0 00-.506-.506H6.536a.506.506 0 00-.453.627l.242.484a1.012 1.012 0 01-.453 1.602l-8.86 4.43a1.012 1.012 0 01-.639 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M19.536 12.322a1.012 1.012 0 010-.639l-4.43-8.859a1.012 1.012 0 01-1.602-.453l-.484.242a.506.506 0 00-.627-.453V4.5a.506.506 0 00.506-.506h1.964a.506.506 0 00.453-.627l-.242-.484a1.012 1.012 0 01.453-1.602l8.86 4.43a1.012 1.012 0 01.639 0z"></path></svg>
+                    <h3 class="flow-title">Analyst AI (CNN)</h3>
+                    <p class="flow-subtitle">Image Recognition</p>
+                </div>
+            </div>
+
+            <!-- Connector from AI to Fusion -->
+             <div class="relative w-full h-16 my-4">
+                <div class="absolute top-0 left-1/4 w-px h-8 bg-gray-700"></div>
+                <div class="absolute top-0 right-1/4 w-px h-8 bg-gray-700"></div>
+                <div class="absolute top-8 left-1/4 w-1/2 h-px bg-gray-700"></div>
+                <div class="absolute top-8 left-1/2 w-px h-8 bg-gray-700"></div>
+            </div>
+            
+            <div class="connector-down -mt-4"></div>
+
+            <!-- Stage 3: Fusion Core -->
+            <div class="flow-box w-full max-w-sm" data-title="Fusion Core" data-content="The central processing brain. It receives geo-location data from the Strategic AI and classified objects from the Analyst AI. It correlates this information, resolves conflicts, and builds a single, unified situational awareness picture.">
+                <svg class="icon text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 3v1.5M4.5 8.25H3m18 0h-1.5M4.5 12H3m18 0h-1.5m-15 3.75H3m18 0h-1.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a3.75 3.75 0 006.336-2.25H5.664A3.75 3.75 0 0012 18z"></path></svg>
+                <h3 class="flow-title">Fusion Core</h3>
+                <p class="flow-subtitle">Unified Threat Assessment</p>
+            </div>
+            
+            <div class="connector-down"></div>
+
+            <!-- Stage 4: Backend -->
+            <div class="flow-box w-full max-w-sm" data-title="Backend Server" data-content="Handles data logistics. It runs an Identification Friend or Foe (IFF) check against the unified data, filtering out known friendly assets. It then formats the remaining threat data for secure transmission to the dashboard.">
+                <svg class="icon text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12h12M6 12a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2M6 12a2 2 0 00-2 2v4a2 2 0 002 2h12a2 2 0 002-2v-4a2 2 0 00-2-2"></path></svg>
+                <h3 class="flow-title">Backend Server</h3>
+                <p class="flow-subtitle">IFF & Data Processing</p>
+            </div>
+
+            <div class="connector-down"></div>
+
+            <!-- Stage 5: Output -->
+            <div class="flow-box w-full max-w-lg" data-title="Output: Tactical Dashboard" data-content="The final user interface for the pilot or commander. It displays a real-time tactical map with all identified and verified enemy threats. Provides data visualization, threat prioritization, and enables rapid, informed decision-making ('Decisive Action').">
+                 <svg class="icon text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <h3 class="flow-title">Output: Tactical Dashboard</h3>
+                <div class="flex justify-center items-center space-x-4 mt-3">
+                     <svg class="mini-icon text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 16.382V5.618a1 1 0 00-1.447-.894L15 7m-6 10v-5.5a2.5 2.5 0 015 0V17"></path></svg>
+                     <svg class="mini-icon text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h12A2.25 2.25 0 0020.25 14.25V3M3.75 3H20.25M3.75 3v11.25A2.25 2.25 0 006 16.5h12A2.25 2.25 0 0020.25 14.25V3.75M17.25 8.25l-4.5 4.5-2.25-2.25-3 3"></path></svg>
+                     <svg class="mini-icon text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10.5 4.5a7.5 7.5 0 100 15 7.5 7.5 0 000-15z"></path><path d="M10.5 10.5L15 15"></path><path d="M13.06 5.5l5.44 2.04a1.5 1.5 0 01.94 1.96l-2.04 5.44a1.5 1.5 0 01-1.96.94l-5.44-2.04a1.5 1.5 0 01-.94-1.96l2.04-5.44a1.5 1.5 0 011.96-.94z"></path></svg>
+                </div>
+                <p class="flow-subtitle mt-4">Complete Situational Awareness & Decisive Action</p>
+            </div>
+        </div>
+        
+        <footer class="text-center mt-20 text-gray-500 text-sm">
+            <p>FLOW CHART OF TRINETRA.</p>
+        </footer>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="flowchart-modal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="modal-title" class="modal-title"></h2>
+                <button id="modal-close-btn" class="modal-close">&times;</button>
+            </div>
+            <div id="modal-content" class="modal-content">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modal = document.getElementById('flowchart-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            const closeModalBtn = document.getElementById('modal-close-btn');
+            const flowBoxes = document.querySelectorAll('.flow-box');
+
+            flowBoxes.forEach(box => {
+                box.addEventListener('click', () => {
+                    const title = box.getAttribute('data-title');
+                    const content = box.getAttribute('data-content');
+
+                    modalTitle.textContent = title;
+                    modalContent.textContent = content;
+                    modal.classList.add('active');
+                });
+            });
+
+            function closeModal() {
+                modal.classList.remove('active');
+            }
+
+            closeModalBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

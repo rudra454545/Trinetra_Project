@@ -1,0 +1,115 @@
+/* --- Sidebar Base --- */
+.app-sidebar {
+  grid-area: sidebar;
+  background-color: rgba(13, 19, 26, 0.7); /* Slightly transparent for glass effect */
+  backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  border-right: 1px solid rgba(0, 191, 255, 0.5);
+  overflow-y: auto;
+  box-shadow: 2px 0 15px rgba(0, 191, 255, 0.1);
+  scrollbar-width: thin;
+  scrollbar-color: #00BFFF #0D131A;
+}
+
+/* Custom scrollbar for Webkit */
+.app-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.app-sidebar::-webkit-scrollbar-thumb {
+  background-color: #00BFFF;
+  border-radius: 3px;
+}
+.app-sidebar::-webkit-scrollbar-track {
+  background-color: #0D131A;
+}
+
+/* --- General Section Styling --- */
+.sidebar-section {
+  background: rgba(10, 20, 30, 0.6);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 191, 255, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.sidebar-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 12px rgba(0, 191, 255, 0.2);
+}
+
+.sidebar-section h4 {
+  color: #00BFFF;
+  border-bottom: 1px solid rgba(0, 191, 255, 0.3);
+  padding-bottom: 0.75rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-section p {
+    color: #aaa;
+    text-align: center;
+    font-style: italic;
+    margin: 2rem 0;
+}
+
+/* --- Chart Section --- */
+.chart-container {
+  min-height: 180px; /* Ensures space even when empty */
+  position: relative;
+  background: rgba(5, 10, 20, 0.4);
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+
+/* --- Fleet Status List --- */
+.fleet-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem; /* Space between list and chart */
+}
+
+.fleet-status-list .unit {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0.6rem;
+  background: rgba(0, 191, 255, 0.05);
+  border-left: 3px solid #00BFFF;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: #ddd;
+}
+
+/* --- Controls Section --- */
+.controls-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.controls-container button {
+  background: linear-gradient(135deg, #004A7F 0%, #0066A1 100%);
+  color: #fff;
+  border: 1px solid #00BFFF;
+  padding: 0.7rem;
+  border-radius: 6px;
+  font-family: 'Consolas', monospace;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.controls-container button:hover {
+  background: linear-gradient(135deg, #007ACC 0%, #0099DD 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(0, 191, 255, 0.4);
+}

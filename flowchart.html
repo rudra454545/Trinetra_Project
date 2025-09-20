@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Trinetra - The Future of Air Defence</title>
+    <!-- Google's <model-viewer> component for 3D models -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&family=Chakra+Petch:wght@500;700&display=swap');
+
+        :root {
+            --primary-color: #00BFFF;
+            --secondary-color: #FFA500;
+            --threat-color: #FF4136;
+            --bg-color: #02040a;
+            --text-color: #EAEAEA;
+            --panel-color: rgba(10, 20, 40, 0.8);
+            --border-color: rgba(0, 191, 255, 0.5);
+        }
+
+        html { scroll-behavior: smooth; }
+        body { background-color: var(--bg-color); color: var(--text-color); font-family: 'Roboto', sans-serif; margin: 0; overflow-x: hidden; }
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        
+        .section { padding: 80px 5%; position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-bottom: 1px solid rgba(0, 191, 255, 0.1); }
+        .hero { min-height: 100vh; }
+
+        h1, h2 { font-family: 'Orbitron', sans-serif; color: var(--primary-color); letter-spacing: 2px; text-shadow: 0 0 10px var(--primary-color), 0 0 15px var(--primary-color); }
+        h1 { font-size: clamp(2.5rem, 10vw, 5rem); margin: 0; }
+        h2 { font-size: 2.5rem; margin-bottom: 40px; }
+        h3 { font-family: 'Chakra Petch', sans-serif; font-weight: 700; color: var(--primary-color); letter-spacing: 1px; }
+
+        /* Hero Section */
+        .hero p { font-size: clamp(1rem, 4vw, 1.5rem); color: #ccc; margin: 20px 0 40px; font-family: 'Chakra Petch', sans-serif; }
+        .scroll-down { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); color: var(--primary-color); font-size: 1rem; animation: bounce 2s infinite; }
+
+        /* Features Section */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; width: 100%; max-width: 1200px; }
+        .feature-card { background: var(--panel-color); border: 1px solid var(--primary-color); border-radius: 10px; padding: 30px; backdrop-filter: blur(10px); transition: transform 0.3s ease, box-shadow 0.3s ease; opacity: 0; transform: translateY(50px); }
+        .feature-card.visible { opacity: 1; transform: translateY(0); }
+        .feature-card:hover { transform: translateY(-10px); box-shadow: 0 0 25px var(--primary-color); }
+        .feature-card h3 { margin-top: 0; font-size: 1.8rem; }
+        .feature-card .catchy-line { font-family: 'Chakra Petch', sans-serif; font-style: italic; color: var(--secondary-color); margin-top: 15px; display: block; font-weight: bold; }
+
+        /* 3D Model Viewer Section */
+        model-viewer { width: 100%; max-width: 600px; height: 600px; border: none; }
+        .quote {
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: var(--secondary-color);
+            margin-top: 30px;
+            text-shadow: 0 0 8px var(--secondary-color);
+            font-style: italic;
+            max-width: 600px;
+        }
+        
+        /* Live Demo Section */
+        .live-demo-container { display: flex; flex-wrap: wrap; gap: 30px; width: 100%; max-width: 1200px; min-height: 500px; background: var(--panel-color); border-radius: 10px; border: 1px solid var(--primary-color); padding: 20px; }
+        .demo-map { flex: 3; min-width: 300px; background-color: #02040a; position: relative; overflow: hidden; background-image: linear-gradient(rgba(25, 40, 80, 0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(25, 40, 80, 0.5) 1px, transparent 1px); background-size: 40px 40px; border-radius: 5px; }
+        .demo-jet, .demo-enemy { position: absolute; transition: all 1s linear; font-size: 24px; text-shadow: 0 0 10px #fff; }
+        .demo-enemy { color: var(--threat-color); }
+        .demo-log { flex: 2; min-width: 300px; text-align: left; background: #050a14; padding: 20px; font-family: 'Courier New', monospace; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 5px; max-height: 460px; }
+        .demo-log h4 { margin-top: 0; color: var(--secondary-color); font-family: 'Orbitron', sans-serif;}
+        #demo-log-list { list-style: none; padding: 0; margin: 0; }
+        #demo-log-list li { margin-bottom: 8px; font-size: 0.9rem; opacity: 0; animation: log-fade-in 0.5s forwards; }
+
+        /* Algorithm (MLP) Section */
+        .algo-container { display: flex; align-items: center; justify-content: center; gap: 30px; width: 100%; max-width: 1000px; padding: 20px; background: var(--panel-color); border-radius: 10px; border: 1px solid var(--primary-color); }
+        .algo-layer { display: flex; flex-direction: column; gap: 20px; align-items: center; }
+        .neuron { width: 50px; height: 50px; background-color: rgba(0, 191, 255, 0.1); border: 2px solid var(--primary-color); border-radius: 50%; transition: background-color 0.3s ease, box-shadow 0.3s ease; position: relative; }
+        .neuron.active { background-color: var(--primary-color); box-shadow: 0 0 20px var(--primary-color); }
+        .layer-title { color: #ccc; font-family: 'Orbitron', sans-serif; margin-bottom: 10px; }
+        
+        /* Flowchart Section */
+        .flowchart-container { position: relative; display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px 20px; align-items: center; padding: 30px; background: var(--panel-color); border-radius: 10px; border: 1px solid var(--primary-color); width: 100%; max-width: 1100px; }
+        .flow-box { background: rgba(5, 10, 25, 0.8); border: 2px solid var(--border-color); border-radius: 8px; padding: 15px; text-align: center; transition: all 0.5s ease; }
+        .flow-box.active, .flow-box:hover { border-color: var(--primary-color); transform: scale(1.05); box-shadow: 0 0 20px var(--primary-color); }
+        .flow-box h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
+        .flow-box p { font-size: 0.8rem; margin: 0; font-family: 'Roboto', sans-serif; }
+        #input-satellite { grid-column: 1 / 3; } #input-radar { grid-column: 3 / 5; } #preprocess { grid-column: 2 / 4; } #ai-cnn { grid-column: 1 / 3; } #ai-mlp { grid-column: 3 / 5; } #ai-fusion { grid-column: 2 / 4; } #backend { grid-column: 1 / 5; } #dashboard { grid-column: 1 / 5; border-color: var(--secondary-color); }
+        #dashboard.active, #dashboard:hover { box-shadow: 0 0 20px var(--secondary-color); }
+        svg.connector { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        svg.connector path { fill: none; stroke-width: 2; stroke: var(--border-color); }
+        svg.connector path.glow { stroke: var(--primary-color); stroke-width: 4px; stroke-dasharray: 200; stroke-dashoffset: 200; animation-fill-mode: forwards; filter: drop-shadow(0 0 5px var(--primary-color)); }
+        
+        /* Tech Stack Section */
+        .tech-stack-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 30px; width: 100%; max-width: 900px; }
+        .tech-icon { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 120px; height: 120px; background-color: rgba(255,255,255,0.05); border-radius: 10px; transition: transform 0.1s ease, background-color 0.2s ease; will-change: transform; }
+        .tech-icon:hover { background-color: rgba(255,255,255,0.1); transform: scale(1.05); }
+        .tech-icon svg { width: 50px; height: 50px; fill: white; transition: fill 0.2s ease; }
+        .tech-icon:hover svg { fill: var(--primary-color); }
+        .tech-icon span { margin-top: 10px; color: #ccc; font-family: 'Chakra Petch', sans-serif; }
+
+        /* Footer & Team Section */
+        footer { background-color: #010205; padding: 50px 5%; text-align: center; border-top: 1px solid var(--primary-color); }
+        .footer-logo, .footer-affiliation { font-family: 'Orbitron', sans-serif; margin-bottom: 15px; }
+        .footer-logo { font-size: 1.5rem; color: var(--secondary-color); }
+        .mission-statement { font-family: 'Chakra Petch', sans-serif; max-width: 800px; margin: 20px auto 40px; }
+        .team-grid { display: flex; gap: 20px; max-width: 100%; justify-content: flex-start; overflow-x: auto; padding-bottom: 20px; -webkit-overflow-scrolling: touch; }
+        .developer-card { background: #0A141A; padding: 25px; border-radius: 8px; border: 1px solid #222; flex-shrink: 0; width: 280px; transition: transform 0.1s ease; will-change: transform; }
+        .dev-image-canvas { width: 120px; height: 120px; border-radius: 50%; background-color: #222; margin: 0 auto 15px; border: 3px solid var(--primary-color); background-size: cover; background-position: center; }
+        .dev-name { font-size: 1.5rem; color: var(--text-color); font-family: 'Orbitron', sans-serif; }
+        .dev-role { color: var(--primary-color); min-height: 40px; font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 0.9rem;}
+        .dev-contact { margin-top: 15px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .dev-contact a { color: #ccc; text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.2s ease; }
+        .dev-contact a:hover { color: var(--primary-color); }
+        .dev-branch { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px; color: #aaa; }
+        .dev-branch svg, .dev-contact svg { width: 20px; height: 20px; fill: currentColor; }
+        
+        /* Keyframe Animations */
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translate(-50%, 0); } 40% { transform: translate(-50%, -20px); } 60% { transform: translate(-50%, -10px); } }
+        @keyframes draw-line { to { stroke-dashoffset: 0; } }
+        @keyframes log-fade-in { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Hero Section -->
+    <section class="hero section">
+        <h1>PROJECT TRINETRA</h1>
+        <p>Turning Threat into Tactical Advantage. Redefining Air Defence with Predictive AI.</p>
+        <div class="scroll-down">Scroll Down ▼</div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+        <h2>CORE FEATURES</h2>
+        <div class="features-grid">
+            <div class="feature-card"><h3>The Strategic Brain</h3><p>A tactical AI that analyzes incoming enemy signals in milliseconds to make the optimal decision: evade, or convert the detection into a targeting opportunity for the entire squadron.</p><span class="catchy-line">Don't just evade the storm. Command the lightning.</span></div>
+            <div class="feature-card"><h3>Satellite Threat Analyst</h3><p>Utilizing a Convolutional Neural Network (CNN), this system scans satellite imagery to identify and classify potential threats—troop movements, new structures, and vehicle convoys—before they become active.</p><span class="catchy-line">See the threat before it sees you.</span></div>
+            <div class="feature-card"><h3>AI Fusion Core</h3><p>The master intelligence unit. It fuses data from both signal and imagery intelligence, providing a single, unified threat level assessment for any region, giving commanders unparalleled situational awareness.</p><span class="catchy-line">One truth from a million data points.</span></div>
+        </div>
+    </section>
+
+    <!-- 3D Model Viewer Section -->
+    <section class="section">
+        <h2>THE GUARDIAN AI</h2>
+        <!-- UPDATED: Reverted to the visible astronaut model -->
+        <model-viewer src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
+                      alt="A 3D model of an astronaut"
+                      ar ar-modes="webxr scene-viewer quick-look" 
+                      camera-controls 
+                      auto-rotate
+                      exposure="1"
+                      camera-orbit="-30deg 75deg"
+                      shadow-intensity="1"
+                      style="--mv-progress-bar-color: var(--primary-color);">
+        </model-viewer>
+        <p class="quote">"Fly safe, our AI is with you."</p>
+    </section>
+    
+    <!-- Live Demo Section -->
+    <section class="section" id="live-demo-section">
+        <h2>LIVE DEMONSTRATION</h2>
+        <div class="live-demo-container">
+            <div class="demo-map" id="demo-map"></div>
+            <div class="demo-log">
+                <h4>LIVE COORDINATES & EVENT LOG</h4>
+                <ul id="demo-log-list"></ul>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Algorithm (MLP) Visualization Section -->
+    <section class="section" id="algorithm-section">
+        <h2>ALGORITHM IN ACTION</h2>
+        <p style="color:#ccc; max-width:800px; margin-bottom: 30px;">Our MLP algorithm uses Trilateration. When an enemy emits a signal, at least three of our jets receive it at slightly different nanoseconds. These tiny time differences are the inputs. The AI processes these inputs through its hidden layers to calculate and predict the enemy's exact coordinates.</p>
+        <div class="algo-container">
+            <div class="algo-layer">
+                <div class="layer-title">INPUT</div>
+                <div class="neuron input"></div>
+                <div class="neuron input"></div>
+                <div class="neuron input"></div>
+            </div>
+            <div class="algo-layer">
+                <div class="layer-title">HIDDEN 1</div>
+                <div class="neuron hidden1"></div>
+                <div class="neuron hidden1"></div>
+                <div class="neuron hidden1"></div>
+                <div class="neuron hidden1"></div>
+            </div>
+            <div class="algo-layer">
+                <div class="layer-title">HIDDEN 2</div>
+                <div class="neuron hidden2"></div>
+                <div class="neuron hidden2"></div>
+                <div class="neuron hidden2"></div>
+            </div>
+            <div class="algo-layer">
+                <div class="layer-title">OUTPUT</div>
+                <div class="neuron output"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- System Architecture Flowchart Section -->
+    <section class="section" id="flowchart-section">
+        <h2>SYSTEM ARCHITECTURE FLOW</h2>
+        <div class="flowchart-container" id="flowchart">
+            <div class="flow-box" id="input-satellite"><h3>INPUT: Satellite Imagery</h3><p>IMINT Data Stream</p></div>
+            <div class="flow-box" id="input-radar"><h3>INPUT: Radar Signals</h3><p>SIGINT Data Stream</p></div>
+            <div class="flow-box" id="preprocess"><h3>STEP 1: Preprocessing</h3><p>Clean, Standardize, Format</p></div>
+            <div class="flow-box" id="ai-cnn"><h3>STEP 2a: Analyst AI (CNN)</h3><p>Image Recognition</p></div>
+            <div class="flow-box" id="ai-mlp"><h3>STEP 2b: Strategic AI (MLP)</h3><p>Signal Analysis</p></div>
+            <div class="flow-box" id="ai-fusion"><h3>STEP 3: Fusion Core</h3><p>Unified Threat Assessment</p></div>
+            <div class="flow-box" id="backend"><h3>STEP 4: Backend Server</h3><p>Simulation & API</p></div>
+            <div class="flow-box" id="dashboard"><h3>OUTPUT: Tactical Dashboard</h3><p>Real-Time Visualization</p></div>
+            <svg class="connector" id="svg-connectors"></svg>
+        </div>
+    </section>
+    
+    <!-- Technology Stack -->
+    <section class="section">
+        <h2>TECHNOLOGY STACK</h2>
+        <div class="tech-stack-grid">
+            <div class="tech-icon"><svg viewBox="0 0 128 128"><path d="M64 0a64 64 0 100 128 64 64 0 000-128zM41 99L25 64l16-35h17l-16 35 16 35H41zm46 0L71 64l16-35h17l-16 35 16 35H87z"/></svg><span>Python</span></div>
+            <div class="tech-icon"><svg viewBox="0 0 24 24"><path d="M12 1.5A10.5 10.5 0 001.5 12a10.49 10.49 0 0012.28 10.47l-1.92-1.92A8.5 8.5 0 1112 3.5a8.49 8.49 0 017.5 4.96l2.13-2.13A10.47 10.47 0 0012 1.5zM12 7a5 5 0 00-5 5H4a8 8 0 018-8zm0 4a1 1 0 11-1 1 1 1 0 011-1z"/></svg><span>TensorFlow</span></div>
+            <div class="tech-icon"><svg viewBox="0 0 24 24"><path d="M22 10.76V8.25a2 2 0 00-2-2H4a2 2 0 00-2 2v7.5a2 2 0 002 2h16a2 2 0 002-2v-2.51a4.23 4.23 0 00-.23-1.49 4.23 4.23 0 00.23-1.49zM12 8.25h8v2.25h-8zM4 15.75v-7.5h6v7.5z"/></svg><span>Pandas</span></div>
+            <div class="tech-icon"><svg viewBox="0 0 24 24"><path d="M12.89 3L4 12.89V20h7.11L20 11.11z M9.6 18H6v-3.6l7.5-7.5l3.6 3.6z"/></svg><span>Pygame</span></div>
+            <div class="tech-icon"><svg viewBox="0 0 24 24"><path d="M12 2.04c-5.5 0-10 4.49-10 10s4.5 10 10 10 10-4.49 10-10-4.5-10-10-10zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z M12.5 7v5.5l4.5 2.67-1 1.73-5.5-3.25V7z"/></svg><span>Flask</span></div>
+            <div class="tech-icon"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-5-9h4V7h2v4h4v2h-4v4h-2v-4H7v-2z"/></svg><span>Three.js</span></div>
+            <div class="tech-icon"><svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 0-2 2v2H8a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h2v2a2 2 0 0 0 2 2h2v2a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-2h2a2 2 0 0 0 2-2v-2h2a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2h-2V8a2 2 0 0 0-2-2h-2V4a2 2 0 0 0-2-2h-4zm0 2h4v2h2v2h2v4h-2v2h-2v2h-4v-2H8v-2H6v-4h2V8h2V4z"/></svg><span>CNN</span></div>
+            <div class="tech-icon"><svg viewBox="0 0 24 24"><path d="M16.14 3c-1.2.43-2.09 1.2-2.81 2.05a4.8 4.8 0 0 0-1.25 2.89A5.22 5.22 0 0 0 13.5 12a5.22 5.22 0 0 0-1.42 4.06c.07.9.4 1.83 1.25 2.89.72.85 1.61 1.62 2.81 2.05a4.2 4.2 0 0 0 4.06 0c1.2-.43 2.09-1.2 2.81-2.05.85-1.06 1.18-2 1.25-2.89a5.22 5.22 0 0 0-1.42-4.06 5.22 5.22 0 0 0 1.42-4.06c-.07-.9-.4-1.83-1.25-2.89C22.29 4.2 21.4 3.43 20.2 3a4.2 4.2 0 0 0-4.06 0zM7.86 3C6.66 3.43 5.77 4.2 5.05 5.05A4.8 4.8 0 0 0 3.8 7.94a5.22 5.22 0 0 0-1.42 4.06 5.22 5.22 0 0 0 1.42 4.06c.07.9.4 1.83 1.25 2.89.72.85 1.61 1.62 2.81 2.05a4.2 4.2 0 0 0 4.06 0c1.2-.43 2.09-1.2 2.81-2.05.85-1.06 1.18-2 1.25-2.89a5.22 5.22 0 0 0-1.42-4.06 5.22 5.22 0 0 0 1.42-4.06c-.07-.9-.4-1.83-1.25-2.89C13.71 4.2 12.82 3.43 11.62 3a4.2 4.2 0 0 0-3.76 0z"/></svg><span>OpenCV</span></div>
+            <div class="tech-icon"><svg viewBox="0 0 24 24"><path d="M4 4h4v16H4V4zm6 0h4v16h-4V4zm6 6h4v10h-4V10zM16 4h4v4h-4V4z"/></svg><span>Matplotlib</span></div>
+            <div class="tech-icon"><svg role="img" viewBox="0 0 24 24"><path d="M11.998 21.84a.436.436 0 0 1-.375-.213L9.24 17.59a.434.434 0 0 1-.031-.43l.8-2.61a.433.433 0 0 1 .407-.294h3.17a.433.433 0 0 1 .407.294l.8 2.61a.434.434 0 0 1-.031.43l-2.383 4.037a.436.436 0 0 1-.375.213zm-8.88-3.414a.435.435 0 0 1-.416-.644l2.39-4.027a.434.434 0 0 1 .374-.216h4.75a.434.434 0 0 1 .375.216l.89.89a.434.434 0 0 1-.31.74h-4.22a.433.433 0 0 0-.374.216l-2.38 4.027a.434.434 0 0 1-.433.25zm13.134 0a.434.434 0 0 1-.433-.25L13.43 14.15a.434.434 0 0 0-.374-.216h-1.57a.434.434 0 0 1-.31-.74l4.22-4.22a.434.434 0 0 1 .31-.128h3.31a.434.434 0 0 1 .375.216l2.38 4.027a.435.435 0 0 1-.416.644l-4.14 1.25zm-9.3-9.52a.434.434 0 0 1-.375-.216L2.38 4.66a.435.435 0 0 1 .416-.643l4.14-1.25a.434.434 0 0 1 .433.25l2.38 4.027a.434.434 0 0 1-.374.65h-4.75z"/></svg><span>Node.js</span></div>
+            <div class="tech-icon"><svg role="img" viewBox="0 0 24 24"><path d="M12,0A12,12,0,1,0,24,12,12,12,0,0,0,12,0ZM9.5,18.23V9.52L16,15.16V18.23H9.5ZM14.5,5.77V14.48L8,8.84V5.77H14.5Z"/></svg><span>Next.js</span></div>
+            <div class="tech-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-4 6a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm4 8a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm4-8a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg><span>MediaPipe</span></div>
+        </div>
+    </section>
+
+    <!-- Footer & Team Section -->
+    <footer>
+        <div class="footer-logo">TECH OBSCURA</div>
+        <div class="footer-affiliation">A Team From Biju Pattnaik University Of Technology, Rourkela</div>
+        <p class="mission-statement">With an Innovative Idea To Upgrade our Air Defence System and Taking Forward To Make India a Super Power Nation.</p>
+        <h2>THE DEVELOPERS</h2>
+        <div class="team-grid">
+            <div class="developer-card">
+                <div class="dev-image-canvas" style="background-image: url('https://placehold.co/120x120/0A141A/00BFFF?text=RPD');"></div>
+                <div class="dev-name">Rudra Prasad Dutta</div>
+                <div class="dev-role">Auto Detecting And Locking Features</div>
+                <div class="dev-contact"><a href="mailto:rudraprasad.dutta.04@gmail.com"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><span>Email</span></a><a href="tel:+917853851009"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg><span>7853851009</span></a></div>
+                <div class="dev-branch"><svg viewBox="0 0 24 24"><path d="M5 15.5c0 2.8 2.2 5 5 5s5-2.2 5-5H5zm14-1.5c-1.7 0-3 1.3-3 3s1.3 3 3 3 3-1.3 3-3-1.3-3-3-3m-6-1V6c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v7c-2.2.3-4 2.1-4 4.5 0 2.8 2.2 5 5 5 .4 0 .7-.1 1-.2v-1.7c-.3.1-.7.2-1 .2-1.7 0-3-1.3-3-3s1.3-3 3-3h1v-5h2v6.3c1.7.8 3 2.5 3 4.7 0 .5-.1 1-.2 1.5.3-.1.6-.2 1-.2.4 0 .8.1 1.1.3.5-.8.9-1.7.9-2.8 0-2.8-2.2-5-5-5z"/></svg><span>ECE</span></div>
+            </div>
+            <div class="developer-card">
+                <div class="dev-image-canvas" style="background-image: url('https://placehold.co/120x120/0A141A/FFA500?text=RND');"></div>
+                <div class="dev-name">Rudra Narayan Dash</div>
+                <div class="dev-role">Sensual Area Scanning And Threat Predict through Satellite Data</div>
+                <div class="dev-contact"><a href="mailto:rudranarayandas642@gmail.com"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><span>Email</span></a><a href="tel:+918117948648"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg><span>8117948648</span></a></div>
+                <div class="dev-branch"><svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z M20 6H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg><span>CSE</span></div>
+            </div>
+            <div class="developer-card">
+                <div class="dev-image-canvas" style="background-image: url('https://placehold.co/120x120/0A141A/FF4136?text=AKS');"></div>
+                <div class="dev-name">Anup Kumar Sahu</div>
+                <div class="dev-role">Signal Transmissions & Security</div>
+                <div class="dev-contact"><a href="mailto:anupkumarsahu676@gmail.com"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><span>Email</span></a><a href="tel:+918249630676"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg><span>8249630676</span></a></div>
+                <div class="dev-branch"><svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z M20 6H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2z"/></svg><span>CSE</span></div>
+            </div>
+            <div class="developer-card">
+                <div class="dev-image-canvas" style="background-image: url('https://placehold.co/120x120/0A141A/39CCCC?text=PKS');"></div>
+                <div class="dev-name">Pritam Kumar Sahoo</div>
+                <div class="dev-role">Front End Developer</div>
+                <div class="dev-contact"><a href="mailto:pritamiku14@gmail.com"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><span>Email</span></a><a href="tel:+917978844986"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg><span>7978844986</span></a></div>
+                <div class="dev-branch"><svg viewBox="0 0 24 24"><path d="M5 15.5c0 2.8 2.2 5 5 5s5-2.2 5-5H5zm14-1.5c-1.7 0-3 1.3-3 3s1.3 3 3 3 3-1.3 3-3-1.3-3-3-3m-6-1V6c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v7c-2.2.3-4 2.1-4 4.5 0 2.8 2.2 5 5 5 .4 0 .7-.1 1-.2v-1.7c-.3.1-.7.2-1 .2-1.7 0-3-1.3-3-3s1.3-3 3-3h1v-5h2v6.3c1.7.8 3 2.5 3 4.7 0 .5-.1 1-.2 1.5.3-.1.6-.2 1-.2.4 0 .8.1 1.1.3.5-.8.9-1.7.9-2.8 0-2.8-2.2-5-5-5z"/></svg><span>ECE</span></div>
+            </div>
+            <div class="developer-card">
+                <div class="dev-image-canvas" style="background-image: url('https://placehold.co/120x120/0A141A/F012BE?text=BM');"></div>
+                <div class="dev-name">Bubu Majhi</div>
+                <div class="dev-role">Simulator Designer</div>
+                <div class="dev-contact"><a href="mailto:bubumajhi2324n@gmail.com"><svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><span>Email</span></a><a href="tel:+918118022523"><svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg><span>8118022523</span></a></div>
+                <div class="dev-branch"><svg viewBox="0 0 24 24"><path d="M5 15.5c0 2.8 2.2 5 5 5s5-2.2 5-5H5zm14-1.5c-1.7 0-3 1.3-3 3s1.3 3 3 3 3-1.3 3-3-1.3-3-3-3m-6-1V6c0-1.1-.9-2-2-2h-2c-1.1 0-2 .9-2 2v7c-2.2.3-4 2.1-4 4.5 0 2.8 2.2 5 5 5 .4 0 .7-.1 1-.2v-1.7c-.3.1-.7.2-1 .2-1.7 0-3-1.3-3-3s1.3-3 3-3h1v-5h2v6.3c1.7.8 3 2.5 3 4.7 0 .5-.1 1-.2 1.5.3-.1.6-.2 1-.2.4 0 .8.1 1.1.3.5-.8.9-1.7.9-2.8 0-2.8-2.2-5-5-5z"/></svg><span>ECE</span></div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // --- 3D Background Effect ---
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg-canvas'), alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        const particlesCount = 5000;
+        const positions = new Float32Array(particlesCount * 3);
+        for (let i = 0; i < particlesCount * 3; i++) { positions[i] = (Math.random() - 0.5) * 10; }
+        const particlesGeometry = new THREE.BufferGeometry();
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const particlesMaterial = new THREE.PointsMaterial({ size: 0.005, color: '#00BFFF', transparent: true, blending: THREE.AdditiveBlending });
+        const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particleSystem);
+        camera.position.z = 5;
+        const animateBg = () => { requestAnimationFrame(animateBg); particleSystem.rotation.y += 0.0002; renderer.render(scene, camera); };
+        animateBg();
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+
+        // --- Scroll-triggered Animations ---
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    if (entry.target.id === 'algorithm-section') { animateAlgorithm(); }
+                    if (entry.target.id === 'flowchart-section') { startFlowchartAnimation(); }
+                }
+            });
+        }, { threshold: 0.2 });
+        document.querySelectorAll('.feature-card, #algorithm-section, #flowchart-section').forEach(el => observer.observe(el));
+
+        // --- Algorithm (MLP) Animation ---
+        const animateAlgorithm = () => {
+            const allNeurons = document.querySelectorAll('.neuron');
+            allNeurons.forEach(n => n.classList.remove('active'));
+            let delay = 0;
+            const activateLayer = (layer) => {
+                const neurons = document.querySelectorAll(`.neuron.${layer}`);
+                neurons.forEach((neuron, index) => {
+                    setTimeout(() => neuron.classList.add('active'), delay + index * 100);
+                });
+                delay += 500;
+            };
+            activateLayer('input'); activateLayer('hidden1'); activateLayer('hidden2');
+            setTimeout(() => {
+                const outputNeuron = document.querySelector('.neuron.output');
+                if (outputNeuron) outputNeuron.classList.add('active');
+            }, delay);
+        };
+        
+        // --- Flowchart Animation Logic ---
+        let flowchartAnimationRunning = false;
+        function startFlowchartAnimation() {
+            if (flowchartAnimationRunning) return;
+            flowchartAnimationRunning = true;
+            
+            const flowchart = document.getElementById('flowchart');
+            const svg = document.getElementById('svg-connectors');
+            const connections = [ { from: 'input-satellite', to: 'preprocess' }, { from: 'input-radar', to: 'preprocess' }, { from: 'preprocess', to: 'ai-cnn' }, { from: 'preprocess', to: 'ai-mlp' }, { from: 'ai-cnn', to: 'ai-fusion' }, { from: 'ai-mlp', to: 'ai-fusion' }, { from: 'ai-fusion', to: 'backend' }, { from: 'backend', to: 'dashboard' } ];
+            
+            function drawConnectors() {
+                if (!flowchart || !svg) return;
+                svg.innerHTML = '';
+                connections.forEach(conn => {
+                    const fromEl = document.getElementById(conn.from);
+                    const toEl = document.getElementById(conn.to);
+                    if (!fromEl || !toEl) return;
+                    const containerRect = flowchart.getBoundingClientRect();
+                    const fromRect = fromEl.getBoundingClientRect();
+                    const toRect = toEl.getBoundingClientRect();
+                    const startX = fromRect.left - containerRect.left + fromRect.width / 2;
+                    const startY = fromRect.top - containerRect.top + fromRect.height;
+                    const endX = toRect.left - containerRect.left + toRect.width / 2;
+                    const endY = toRect.top - containerRect.top;
+                    const pathD = `M ${startX} ${startY} C ${startX} ${startY + 50}, ${endX} ${endY - 50}, ${endX} ${endY}`;
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    path.setAttribute('d', pathD);
+                    svg.appendChild(path);
+                    const glowPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    glowPath.setAttribute('d', pathD);
+                    glowPath.classList.add('glow');
+                    glowPath.id = `path-${conn.from}-to-${conn.to}`;
+                    svg.appendChild(glowPath);
+                });
+            }
+            
+            const animationSequence = [ { elements: ['input-satellite', 'input-radar'], duration: 500 }, { paths: ['path-input-satellite-to-preprocess', 'path-input-radar-to-preprocess'], duration: 500 }, { elements: ['preprocess'], duration: 500 }, { paths: ['path-preprocess-to-ai-cnn', 'path-preprocess-to-ai-mlp'], duration: 500 }, { elements: ['ai-cnn', 'ai-mlp'], duration: 500 }, { paths: ['path-ai-cnn-to-ai-fusion', 'path-ai-mlp-to-ai-fusion'], duration: 500 }, { elements: ['ai-fusion'], duration: 500 }, { paths: ['path-ai-fusion-to-backend'], duration: 500 }, { elements: ['backend'], duration: 500 }, { paths: ['path-backend-to-dashboard'], duration: 500 }, { elements: ['dashboard'], duration: 500 } ];
+            let currentStep = 0;
+            
+            function runAnimationStep() {
+                const step = animationSequence[currentStep];
+                if (step.elements) { step.elements.forEach(id => document.getElementById(id)?.classList.add('active')); }
+                if (step.paths) { step.paths.forEach(id => { const pathEl = document.getElementById(id); if (pathEl) { pathEl.style.animation = `draw-line ${step.duration / 1000}s linear forwards`; } }); }
+                
+                setTimeout(() => {
+                    if (step.elements) { step.elements.forEach(id => document.getElementById(id)?.classList.remove('active')); }
+                    if (step.paths) { step.paths.forEach(id => { const pathEl = document.getElementById(id); if (pathEl) pathEl.style.animation = 'none'; }); }
+                    currentStep = (currentStep + 1) % animationSequence.length;
+                    if(flowchartAnimationRunning) runAnimationStep();
+                }, step.duration);
+            }
+            
+            drawConnectors();
+            setTimeout(() => {
+                runAnimationStep();
+                window.addEventListener('resize', drawConnectors);
+            }, 100);
+        }
+
+        // --- 3D Tilt Effect for Cards ---
+        const tiltableElements = document.querySelectorAll('.developer-card, .tech-icon');
+        tiltableElements.forEach(el => {
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                const rotateX = -y / 20;
+                const rotateY = x / 20;
+                el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+            });
+            el.addEventListener('mouseleave', () => {
+                el.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+            });
+        });
+
+        // --- Live Demo Simulation Logic ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const demoMap = document.getElementById('demo-map');
+            const logList = document.getElementById('demo-log-list');
+            if (!demoMap || !logList) return;
+
+            const mapWidth = demoMap.offsetWidth;
+            const mapHeight = demoMap.offsetHeight;
+
+            const units = [
+                { id: 'TRN-01', x: mapWidth * 0.2, y: mapHeight * 0.5, type: 'jet', el: document.createElement('div'), angle: 0 },
+                { id: 'HOSTILE-01', x: mapWidth * 0.8, y: mapHeight * 0.5, type: 'enemy', el: document.createElement('div'), angle: 180 },
+            ];
+
+            units.forEach(unit => {
+                unit.el.className = `demo-${unit.type}`;
+                unit.el.innerHTML = unit.type === 'jet' ? '✈️' : '🔻';
+                demoMap.appendChild(unit.el);
+            });
+
+            const demoEvents = [ "System Initialized. TRN-01 on patrol.", "HOSTILE-01 detected on long-range sensors.", "AI calculating optimal intercept course.", "TRN-01 engaging target. Data shared with squadron.", "AI recommends PING BACK. Confidence: 94.2%", "Signal converted to tactical advantage.", "Threat neutralized. Returning to patrol." ];
+            let eventIndex = 0;
+            let logCounter = 0;
+            
+            function updateDemo() {
+                units.forEach(unit => {
+                    unit.angle += (Math.random() - 0.5) * 10;
+                    unit.x += Math.cos(unit.angle * Math.PI / 180) * 3;
+                    unit.y += Math.sin(unit.angle * Math.PI / 180) * 3;
+                    
+                    if (unit.x < 15 || unit.x > mapWidth - 15) { unit.x = Math.max(15, Math.min(mapWidth-15, unit.x)); unit.angle += 180; }
+                    if (unit.y < 15 || unit.y > mapHeight - 15) { unit.y = Math.max(15, Math.min(mapHeight-15, unit.y)); unit.angle += 180; }
+                    
+                    unit.el.style.left = `${unit.x}px`;
+                    unit.el.style.top = `${unit.y}px`;
+                    unit.el.style.transform = `translate(-50%, -50%) rotate(${unit.angle + 90}deg)`;
+                });
+
+                logCounter++;
+                if (logCounter % 2 === 0) {
+                    if (logList.children.length > 5) {
+                        logList.removeChild(logList.lastChild);
+                    }
+                    const newLog = document.createElement('li');
+                    newLog.textContent = `[${new Date().toLocaleTimeString()}] ${demoEvents[eventIndex]}`;
+                    logList.prepend(newLog);
+                    eventIndex = (eventIndex + 1) % demoEvents.length;
+                }
+            }
+            setInterval(updateDemo, 2000);
+        });
+    </script>
+</body>
+</html>
+
+
